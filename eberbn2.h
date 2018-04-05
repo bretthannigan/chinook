@@ -1,7 +1,6 @@
 #ifndef eberbn2_h
 #define eberbn2_h
 
-#include <cstdint>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
