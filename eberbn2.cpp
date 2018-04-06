@@ -2,22 +2,19 @@
 #include "eberbn2.h"
 
 eberbn2::eberbn2(uint8_t pin_oGlowRelay, uint8_t pin_oFanRelay, uint8_t pin_oFuelRelay, uint8_t pin_iFlameSwitch, uint8_t pin_iOverheatSwitch) {
+        
     // Set pins.
     _pin_oGlowRelay = pin_oGlowRelay;
     _pin_oFanRelay = pin_oFanRelay;
     _pin_oFuelRelay = pin_oFuelRelay;
     _pin_iFlameSwitch = pin_iFlameSwitch;
     _pin_iOverheatSwitch = pin_iOverheatSwitch;
+    _fuelPumpPulses = 0;
+
     DDRD = 0;
     DDRD |= (1 << pin_oGlowRelay) | (1 << pin_oFanRelay) | (1 << pin_oFuelRelay);
     DDRD &= ~((1 << _INT0_PIN_) | (1 << pin_iFlameSwitch) | (1 << pin_iFlameSwitch));
     PORTD = 0;
-
-    // // Set ISR to count fuel pump pulses.
-    // fuelPumpPulses = 0;
-    // sei();
-    // EIMSK |= (1 << INT0);
-    // EICRA |= (1 << ISC01);
 }
 
 void eberbn2::set_glowRelay(bool isOn){
@@ -64,6 +61,14 @@ bool eberbn2::_get_port(uint8_t pin) {
     else { return false; }
 }
 
-// ISR(EXT_INT0_vect) {
-//     fuelPumpPulses++;
-// }
+void eberbn2::incrementFuelPumpPulses() {
+    _fuelPumpPulses++;
+}
+
+double eberbn2::get_fuelConsumption() {
+    return _fuelPumpPulses*_L_PER_PULSE;
+}
+
+void eberbn2::ISRtest() {
+    _fuelPumpPulses++;
+}
