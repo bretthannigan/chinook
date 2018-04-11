@@ -6,7 +6,7 @@ extern "C++"{
 state_t cur_state;
 instance_data_t cur_data;
 
-void setup() {
+int main(void) {
   // Configure pin modes.
   
 
@@ -23,9 +23,11 @@ void setup() {
 
 
   cur_state = STATE_INITIAL;
-}
 
-void loop() {
+  while (1) {
+
+  }
+  return 0;
 }
 
 // Interrupt service routines.

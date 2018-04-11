@@ -1,9 +1,12 @@
 #ifndef statemachine_h
 #define statemachine_h
+#ifndef NULL
+#define NULL 0
+#endif
 
 #define _MOVING_AVERAGE_SIZE_ 5
 
-#include <Arduino.h>
+//#include <Arduino.h>
 #include "eberbn2.h"
 #include "pins.h"
 

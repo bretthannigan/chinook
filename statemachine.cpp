@@ -10,7 +10,7 @@ void onAllStates(instance_data_t *data) {
 }
 
 state_t onStateInitial(instance_data_t *data) {
-  Serial.println("Initial state");
+  //Serial.println("Initial state");
   data->iState = 0;
   data->heater = new eberbn2(_PIN_O_GLOW_RELAY_, _PIN_O_FAN_RELAY_, _PIN_O_FUEL_RELAY_, _PIN_I_SW_FLAME_, _PIN_I_SW_OVERHEAT_);
   // Initialize pins. Heater interface pins are taken care of by eberbn2 class.
@@ -19,7 +19,7 @@ state_t onStateInitial(instance_data_t *data) {
 }
 
 state_t onStateStandby(instance_data_t *data) {
-  Serial.println("Standby state");
+  //Serial.println("Standby state");
   if (data->heater->get_overheatSwitch()) {
     data->errorCode = ERROR_OVERHEAT;
     return STATE_ERROR_COOLDOWN;
@@ -34,7 +34,7 @@ state_t onStateStandby(instance_data_t *data) {
 }
 
 state_t onStateWarmup(instance_data_t *data) {
-  Serial.println("Warmup state");
+  //Serial.println("Warmup state");
   if (data->iState*SAMPLE_TIME_MS > TIMEOUT_STATE_WARMUP_MS) {
     return STATE_START;
   } else {
@@ -43,7 +43,7 @@ state_t onStateWarmup(instance_data_t *data) {
 }
 
 state_t onStateStart(instance_data_t *data) {
-  Serial.println("Start state");
+  //Serial.println("Start state");
   if (data->heater->get_overheatSwitch()) {
     data->errorCode = ERROR_OVERHEAT;
     return STATE_ERROR_COOLDOWN;
@@ -58,7 +58,7 @@ state_t onStateStart(instance_data_t *data) {
 }
 
 state_t onStateRun(instance_data_t *data) {
-  Serial.println("Run state");
+  //Serial.println("Run state");
   if (data->heater->get_overheatSwitch()) {
     data->errorCode = ERROR_OVERHEAT;
     return STATE_ERROR_COOLDOWN;
@@ -73,7 +73,7 @@ state_t onStateRun(instance_data_t *data) {
 }
 
 state_t onStateCooldown(instance_data_t *data) {
-  Serial.println("Cooldown state");
+  ///Serial.println("Cooldown state");
   if (data->heater->get_flameSwitch()) {
     data->errorCode = ERROR_NOFLAME;
     return STATE_ERROR_COOLDOWN;
@@ -113,35 +113,35 @@ void onTransitionStandby(instance_data_t *data) {
   data->heater->set_fuelRelay(0);
   data->heater->set_fanRelay(0);
   data->heater->set_glowRelay(0);
-  Serial.println("Transition to standby state");
+  //Serial.println("Transition to standby state");
 }
 
 void onTransitionWarmup(instance_data_t *data) {
   data->heater->set_fuelRelay(0);
   data->heater->set_fanRelay(0);
   data->heater->set_glowRelay(1);
-  Serial.println("Transition to warmup state");
+  //Serial.println("Transition to warmup state");
 }
 
 void onTransitionStart(instance_data_t *data) {
   data->heater->set_fuelRelay(1);
   data->heater->set_fanRelay(1);
   data->heater->set_glowRelay(1);
-  Serial.println("Transition to start state");
+  //Serial.println("Transition to start state");
 }
 
 void onTransitionRun(instance_data_t *data) {
   data->heater->set_fuelRelay(1);
   data->heater->set_fanRelay(1);
   data->heater->set_glowRelay(0);
-  Serial.println("Transition to run state");
+  //Serial.println("Transition to run state");
 }
 
 void onTransitionCooldown(instance_data_t *data) {
   data->heater->set_fuelRelay(0);
   data->heater->set_fanRelay(1);
   data->heater->set_glowRelay(0);
-  Serial.println("Transition to cooldown state");
+  //Serial.println("Transition to cooldown state");
 }
 
 void onTransitionErrorCooldown(instance_data_t *data) {
@@ -154,7 +154,7 @@ void onTransitionError(instance_data_t *data) {
   data->heater->set_fuelRelay(0);
   data->heater->set_fanRelay(0);
   data->heater->set_glowRelay(0);
-  Serial.println("Transition to error state");
+  //Serial.println("Transition to error state");
 }
 
 /* State Transition Mechanism */
@@ -175,9 +175,9 @@ state_t run_state(state_t current_state, instance_data_t *data) {
 void flashErrorCode(error_t err) {
   static uint16_t iFlash = 0;
   if (iFlash%(NUM_ERRORS << 1)<(err << 1)) {
-    digitalWrite(_PIN_O_LED_ERROR_, iFlash%2);
+    //digitalWrite(_PIN_O_LED_ERROR_, iFlash%2);
   } else {
-    digitalWrite(_PIN_O_LED_ERROR_, 0);
+    //digitalWrite(_PIN_O_LED_ERROR_, 0);
   }
   iFlash++;
 }
