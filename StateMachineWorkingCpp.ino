@@ -7,7 +7,8 @@ state_t cur_state;
 instance_data_t cur_data;
 
 void setup() {
-  pinMode(13, OUTPUT);
+  // Configure pin modes.
+  
 
   cli();
   // Set timer interrupt for sampling rate.
@@ -18,18 +19,16 @@ void setup() {
   TCCR1B |= ((1 << CS10) | (1 << CS12));
   TIMSK1 |= (1 << OCIE1A);
   sei();
-
   // Set external interrupt to count fuel pump pulses.
-  EIMSK |= (1 << INT0);
-  EICRA |= (1 << ISC01);
+
 
   cur_state = STATE_INITIAL;
-  Serial.begin(9600);
-  Serial.println("test");
 }
 
 void loop() {
 }
+
+// Interrupt service routines.
 
 ISR(TIMER1_COMPA_vect)
 {
@@ -37,7 +36,6 @@ ISR(TIMER1_COMPA_vect)
 }
 
 ISR(INT0_vect) {
-  Serial.println("Interrupted.");
-  cur_data.heater->ISRtest();
-  Serial.println(cur_data.heater->get_fuelConsumption(), DEC);
+  cur_data.heater->ISR_fuelPumpPulse();
+  cur_data.lastPulses[cur_data.iState % _MOVING_AVERAGE_SIZE_]++;
 }

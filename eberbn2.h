@@ -16,7 +16,6 @@ class eberbn2 {
         bool get_fuelRelay();
         bool get_flameSwitch();
         bool get_overheatSwitch();
-        void incrementFuelPumpPulses();
         double get_fuelConsumption();
 
     private:
@@ -28,7 +27,7 @@ class eberbn2 {
         uint32_t _fuelPumpPulses;
         constexpr static double _L_PER_PULSE = 0.00003125; // 6.25 cc per 200 strokes. Source: http://shoptalkforums.com/viewtopic.php?t=113760#top
         friend void INT0_vect(void);
-        void ISRtest();
+        void ISR_fuelPumpPulse();
 };
 
 #endif

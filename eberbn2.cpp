@@ -15,6 +15,10 @@ eberbn2::eberbn2(uint8_t pin_oGlowRelay, uint8_t pin_oFanRelay, uint8_t pin_oFue
     DDRD |= (1 << pin_oGlowRelay) | (1 << pin_oFanRelay) | (1 << pin_oFuelRelay);
     DDRD &= ~((1 << _INT0_PIN_) | (1 << pin_iFlameSwitch) | (1 << pin_iFlameSwitch));
     PORTD = 0;
+
+    // Set interrupt for fan pulses.
+    EIMSK |= (1 << INT0);
+    EICRA |= (1 << ISC01);
 }
 
 void eberbn2::set_glowRelay(bool isOn){
@@ -61,14 +65,10 @@ bool eberbn2::_get_port(uint8_t pin) {
     else { return false; }
 }
 
-void eberbn2::incrementFuelPumpPulses() {
-    _fuelPumpPulses++;
-}
-
 double eberbn2::get_fuelConsumption() {
     return _fuelPumpPulses*_L_PER_PULSE;
 }
 
-void eberbn2::ISRtest() {
+void eberbn2::ISR_fuelPumpPulse() {
     _fuelPumpPulses++;
 }

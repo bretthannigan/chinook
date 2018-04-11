@@ -1,4 +1,3 @@
-#include "Arduino.h"
 #include "statemachine.h"
 #include "pins.h"
 #include "timeoutconstants.h"
@@ -6,19 +5,21 @@
 
 /* State Functions */
 
+void onAllStates(instance_data_t *data) {
+  data->iState++;
+}
+
 state_t onStateInitial(instance_data_t *data) {
   Serial.println("Initial state");
-  data->stateTime_ms = 0;
-  data->heater = new eberbn2(_PIN_O_GLOW_RELAY_, _PIN_O_FAN_RELAY_, _PIN_O_FUEL_RELAY_, _PIN_I_FLAME_SWITCH_, _PIN_I_OVERHEAT_SWITCH_);
+  data->iState = 0;
+  data->heater = new eberbn2(_PIN_O_GLOW_RELAY_, _PIN_O_FAN_RELAY_, _PIN_O_FUEL_RELAY_, _PIN_I_SW_FLAME_, _PIN_I_SW_OVERHEAT_);
   // Initialize pins. Heater interface pins are taken care of by eberbn2 class.
-  
   data->errorCode = ERROR_NONE;
   return STATE_STANDBY;
 }
 
 state_t onStateStandby(instance_data_t *data) {
   Serial.println("Standby state");
-  data->stateTime_ms = data->stateTime_ms + SAMPLE_TIME_MS;
   if (data->heater->get_overheatSwitch()) {
     data->errorCode = ERROR_OVERHEAT;
     return STATE_ERROR_COOLDOWN;
@@ -34,8 +35,7 @@ state_t onStateStandby(instance_data_t *data) {
 
 state_t onStateWarmup(instance_data_t *data) {
   Serial.println("Warmup state");
-  data->stateTime_ms = data->stateTime_ms + SAMPLE_TIME_MS;
-  if (data->stateTime_ms > TIMEOUT_STATE_WARMUP_MS) {
+  if (data->iState*SAMPLE_TIME_MS > TIMEOUT_STATE_WARMUP_MS) {
     return STATE_START;
   } else {
     return STATE_WARMUP;
@@ -44,13 +44,12 @@ state_t onStateWarmup(instance_data_t *data) {
 
 state_t onStateStart(instance_data_t *data) {
   Serial.println("Start state");
-  data->stateTime_ms = data->stateTime_ms + SAMPLE_TIME_MS;
   if (data->heater->get_overheatSwitch()) {
     data->errorCode = ERROR_OVERHEAT;
     return STATE_ERROR_COOLDOWN;
   } else if (data->heater->get_flameSwitch()) {
     return STATE_RUN;
-  } else if (data->stateTime_ms > TIMEOUT_STATE_START_MS) {
+  } else if (data->iState*SAMPLE_TIME_MS > TIMEOUT_STATE_START_MS) {
     data->errorCode = ERROR_NOFLAME;
     return STATE_ERROR_COOLDOWN;
   } else {
@@ -60,7 +59,6 @@ state_t onStateStart(instance_data_t *data) {
 
 state_t onStateRun(instance_data_t *data) {
   Serial.println("Run state");
-  data->stateTime_ms = data->stateTime_ms + SAMPLE_TIME_MS;
   if (data->heater->get_overheatSwitch()) {
     data->errorCode = ERROR_OVERHEAT;
     return STATE_ERROR_COOLDOWN;
@@ -76,11 +74,10 @@ state_t onStateRun(instance_data_t *data) {
 
 state_t onStateCooldown(instance_data_t *data) {
   Serial.println("Cooldown state");
-  data->stateTime_ms = data->stateTime_ms + SAMPLE_TIME_MS;
   if (data->heater->get_flameSwitch()) {
     data->errorCode = ERROR_NOFLAME;
     return STATE_ERROR_COOLDOWN;
-  } else if (data->stateTime_ms > TIMEOUT_STATE_COOLDOWN_MS) {
+  } else if (data->iState*SAMPLE_TIME_MS > TIMEOUT_STATE_COOLDOWN_MS) {
     if (data->heater->get_flameSwitch()) {
       data->errorCode = ERROR_FLAME;
       return STATE_ERROR_COOLDOWN;
@@ -93,9 +90,8 @@ state_t onStateCooldown(instance_data_t *data) {
 }
 
 state_t onStateErrorCooldown(instance_data_t *data) {
-  data->stateTime_ms = data->stateTime_ms + SAMPLE_TIME_MS;
   flashErrorCode(data->errorCode);
-  if (data->stateTime_ms > TIMEOUT_STATE_COOLDOWN_MS) {
+  if (data->iState*SAMPLE_TIME_MS > TIMEOUT_STATE_COOLDOWN_MS) {
     return STATE_ERROR_COOLDOWN;
   } else {
     return STATE_ERROR;
@@ -103,15 +99,17 @@ state_t onStateErrorCooldown(instance_data_t *data) {
 }
 
 state_t onStateError(instance_data_t *data) {
-  data->stateTime_ms = data->stateTime_ms + SAMPLE_TIME_MS;
   flashErrorCode(data->errorCode);
   return STATE_ERROR;
 }
 
 /* State Transition Functions */
 
+void onAllTransitions(instance_data_t *data) {
+  data->iState = 0;
+}
+
 void onTransitionStandby(instance_data_t *data) {
-  data->stateTime_ms = 0;
   data->heater->set_fuelRelay(0);
   data->heater->set_fanRelay(0);
   data->heater->set_glowRelay(0);
@@ -119,7 +117,6 @@ void onTransitionStandby(instance_data_t *data) {
 }
 
 void onTransitionWarmup(instance_data_t *data) {
-  data->stateTime_ms = 0;
   data->heater->set_fuelRelay(0);
   data->heater->set_fanRelay(0);
   data->heater->set_glowRelay(1);
@@ -127,7 +124,6 @@ void onTransitionWarmup(instance_data_t *data) {
 }
 
 void onTransitionStart(instance_data_t *data) {
-  data->stateTime_ms = 0;
   data->heater->set_fuelRelay(1);
   data->heater->set_fanRelay(1);
   data->heater->set_glowRelay(1);
@@ -135,7 +131,6 @@ void onTransitionStart(instance_data_t *data) {
 }
 
 void onTransitionRun(instance_data_t *data) {
-  data->stateTime_ms = 0;
   data->heater->set_fuelRelay(1);
   data->heater->set_fanRelay(1);
   data->heater->set_glowRelay(0);
@@ -143,7 +138,6 @@ void onTransitionRun(instance_data_t *data) {
 }
 
 void onTransitionCooldown(instance_data_t *data) {
-  data->stateTime_ms = 0;
   data->heater->set_fuelRelay(0);
   data->heater->set_fanRelay(1);
   data->heater->set_glowRelay(0);
@@ -151,14 +145,12 @@ void onTransitionCooldown(instance_data_t *data) {
 }
 
 void onTransitionErrorCooldown(instance_data_t *data) {
-  data->stateTime_ms = 0;
   data->heater->set_fuelRelay(0);
   data->heater->set_fanRelay(1);
   data->heater->set_glowRelay(0);
 }
 
 void onTransitionError(instance_data_t *data) {
-  data->stateTime_ms = 0;
   data->heater->set_fuelRelay(0);
   data->heater->set_fanRelay(0);
   data->heater->set_glowRelay(0);
@@ -171,8 +163,10 @@ state_t run_state(state_t current_state, instance_data_t *data) {
   state_t new_state = state_table[current_state][new_state](data);
   transition_func_t* transition = transition_table[current_state][new_state];
   if(transition) {
+    onAllTransitions(data);
     transition(data);
   }
+  onAllStates(data);
   return new_state;
 }
 
@@ -181,9 +175,9 @@ state_t run_state(state_t current_state, instance_data_t *data) {
 void flashErrorCode(error_t err) {
   static uint16_t iFlash = 0;
   if (iFlash%(NUM_ERRORS << 1)<(err << 1)) {
-    digitalWrite(_PIN_O_ERROR_LED_, iFlash%2);
+    digitalWrite(_PIN_O_LED_ERROR_, iFlash%2);
   } else {
-    digitalWrite(_PIN_O_ERROR_LED_, 0);
+    digitalWrite(_PIN_O_LED_ERROR_, 0);
   }
   iFlash++;
 }
