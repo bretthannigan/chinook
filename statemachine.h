@@ -1,5 +1,6 @@
 #ifndef statemachine_h
 #define statemachine_h
+
 #ifndef NULL
 #define NULL 0
 #endif
@@ -8,6 +9,7 @@
 
 //#include <Arduino.h>
 #include "eberbn2.h"
+#include "timeoutconstants.h"
 #include "pins.h"
 
 typedef enum { STATE_INITIAL, STATE_STANDBY, STATE_WARMUP, STATE_START, STATE_RUN, STATE_COOLDOWN, STATE_ERROR_COOLDOWN, STATE_ERROR, NUM_STATES } state_t;
