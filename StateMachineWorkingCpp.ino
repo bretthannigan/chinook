@@ -2,42 +2,62 @@ extern "C++"{
   #include "statemachine.h"
 }
 #include <avr/interrupt.h>
+#include <Arduino.h>
 
-state_t cur_state;
-instance_data_t cur_data;
+state_t CurrentState;
+instance_data_t CurrentData;
+volatile uint8_t TimerTicks = 0;
+volatile bool IsStateReady = 1;
 
 int main(void) {
+  uint8_t timerTicks;
+  bool isStateReady;
+
   // Configure pin modes.
-  
+  Serial.begin(115200);
 
   cli();
   // Set timer interrupt for sampling rate.
-  TCCR1A = 0;
-  TCCR1B = 0;
-  OCR1A = 15624;
-  TCCR1B |= (1 << WGM12);
-  TCCR1B |= ((1 << CS10) | (1 << CS12));
-  TIMSK1 |= (1 << OCIE1A);
+  TCCR2A = 0;
+  TCCR2B = 0;
+  TCNT2 = 0;
+  OCR2A = 60; // for a 256 Hz timer.
+  TCCR2A |= (1 << WGM21);
+  TCCR2B |= ((1 << CS20) | (1 << CS21) | (1 << CS22)); // 1/1024 pre-scaler.
+  TIMSK2 |= (1 << OCIE2A);
   sei();
   // Set external interrupt to count fuel pump pulses.
 
-
-  cur_state = STATE_INITIAL;
+  CurrentState = STATE_INITIAL;
 
   while (1) {
-
+    cli();
+    timerTicks = TimerTicks;
+    isStateReady = IsStateReady;
+    sei();
+    if ((timerTicks==0) && isStateReady) {
+      IsStateReady = false;
+      Serial.println(TimerTicks, DEC);
+      Serial.println(IsStateReady, DEC);
+      //Serial.println("Run state");
+      CurrentState = run_state(CurrentState, &CurrentData);
+      Serial.println("test");
+      
+    }
   }
+  
   return 0;
 }
 
 // Interrupt service routines.
 
-ISR(TIMER1_COMPA_vect)
+ISR(TIMER2_COMPA_vect)
 {
-  cur_state = run_state(cur_state, &cur_data);
+  TimerTicks++;
+  IsStateReady = true;
 }
 
 ISR(INT0_vect) {
-  cur_data.heater->ISR_fuelPumpPulse();
-  cur_data.lastPulses[cur_data.iState % _MOVING_AVERAGE_SIZE_]++;
+  CurrentData.heater->ISR_fuelPumpPulse();
+  CurrentData.lastPulses[CurrentData.iState % _MOVING_AVERAGE_SIZE_]++;
 }
