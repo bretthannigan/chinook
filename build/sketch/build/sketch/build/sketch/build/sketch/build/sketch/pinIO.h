@@ -15,13 +15,34 @@ template<port _port, uint8_t bit> class pin_t
         static constexpr uint8_t _pin = _port - 2;
         enum { mask=1<<bit };
         pin_t(ddr direction) { 
+            // Constructor (initialize bit).
             *(volatile uint8_t*)_ddr = *(volatile uint8_t*)_ddr & ~mask | (direction & mask);
         }
         constexpr void operator=(bool n) {
+            // Assignment operator (write bit).
             *(volatile uint8_t*)_port = *(volatile uint8_t*)_port & ~mask | (n & mask);
         }
-        static constexpr void toggle() { *(volatile uint8_t*)_port ^= mask; }
-        static constexpr bool read() { *(volatile uint8_t*)_pin & mask; }
+        constexpr bool operator==(bool n) {
+            // Equal to operator (read bit).
+            return this->read();
+        }
+        constexpr bool operator!() {
+            // Logical negation operator (read bit).
+            return ~this->read();
+        }
+        constexpr bool operator!=(bool n) {
+            // Not equal to operator (read bit).
+            return this->read() != n;
+        }
+        constexpr bool operator&&(bool n) {
+            // Logical and operator.
+            return this->read() && n;
+        }      
+        constexpr void operator||(bool n) {
+            return this->read() || n;
+        }
+
+        static constexpr bool read() { return *(volatile uint8_t*)_pin && mask; }
 };
 
 #endif
