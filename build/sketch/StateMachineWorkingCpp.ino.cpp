@@ -1,3 +1,5 @@
+#line 1 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino"
+#line 1 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino"
 extern "C++"{
   #include "statemachine.h"
 }
@@ -9,6 +11,9 @@ instance_data_t CurrentData;
 volatile uint8_t TimerTicks = 0;
 volatile bool IsStateReady = 1;
 
+#line 12 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino"
+int main(void);
+#line 12 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino"
 int main(void) {
   uint8_t timerTicks;
   bool isStateReady;

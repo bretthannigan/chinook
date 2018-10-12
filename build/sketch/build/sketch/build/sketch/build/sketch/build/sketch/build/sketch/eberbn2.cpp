@@ -2,7 +2,7 @@
 #include "eberbn2.h"
 #include "pinIO.h"
 
-pin_t<B, 5> test(input);
+pin_t<B, 5> test(INPUT);
 
 eberbn2::eberbn2(uint8_t pin_oGlowRelay, uint8_t pin_oFanRelay, uint8_t pin_oFuelRelay, uint8_t pin_iFlameSwitch, uint8_t pin_iOverheatSwitch) {
         
@@ -64,7 +64,7 @@ bool eberbn2::get_overheatSwitch() {
 // Helper functions.
 
 void eberbn2::_set_port(uint8_t pin, bool val) {
-    //gpio_wr(PORT, port, pin, 1, 1, val);
+    gpio_wr(PORT, port, pin, 1, 1, val);
 }
 
 bool eberbn2::_get_port(uint8_t pin) {

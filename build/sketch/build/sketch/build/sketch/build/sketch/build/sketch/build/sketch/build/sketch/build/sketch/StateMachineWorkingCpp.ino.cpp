@@ -1,3 +1,5 @@
+#line 1 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino"
+#line 1 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino"
 extern "C++"{
   #include "statemachine.h"
 }
