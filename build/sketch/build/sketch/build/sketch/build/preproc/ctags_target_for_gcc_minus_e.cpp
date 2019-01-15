@@ -3,8 +3,13 @@
 extern "C++"{
 # 3 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino" 2
 }
-# 5 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino" 2
-# 6 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino" 2
+
+
+
+
+
+//#include <Arduino.h>
+# 11 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino" 2
 
 state_t CurrentState;
 instance_data_t CurrentData;
@@ -16,7 +21,7 @@ int main(void) {
   bool isStateReady;
 
   // Configure pin modes.
-  Serial.begin(115200);
+  //Serial.begin(115200);
 
   __asm__ __volatile__ ("cli" ::: "memory");
   // Set timer interrupt for sampling rate.

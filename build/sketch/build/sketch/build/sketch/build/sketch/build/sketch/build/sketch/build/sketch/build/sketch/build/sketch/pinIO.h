@@ -41,9 +41,11 @@ template<port _port, uint8_t bit> class pin_t
         constexpr void operator||(bool n) {
             return this->read() || n;
         }
+        explicit operator bool() const {
+            return this->read();
+        }
 
-        static constexpr void toggle() { *(volatile uint8_t*)_port ^= mask; }
-        static constexpr bool read() { *(volatile uint8_t*)_pin & mask; }
+        static constexpr bool read() { return *(volatile uint8_t*)_pin & mask; }
 };
 
 #endif

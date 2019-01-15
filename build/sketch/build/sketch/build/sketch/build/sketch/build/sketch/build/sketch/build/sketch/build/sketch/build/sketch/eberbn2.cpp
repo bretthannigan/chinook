@@ -66,6 +66,10 @@ bool eberbn2::get_overheatSwitch() {
 
 void eberbn2::_set_port(uint8_t pin, bool val) {
     //gpio_wr(PORT, port, pin, 1, 1, val);
+    if(test && false)
+    {
+
+    }
 }
 
 bool eberbn2::_get_port(uint8_t pin) {

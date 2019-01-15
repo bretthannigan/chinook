@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 enum port { B = (const uint16_t) &PORTB, C = (const uint16_t) &PORTC, D = (const uint16_t) &PORTD };
-enum ddr { input = 0, output = 1 }; // Comment out if Arduino.h is loaded.
+enum ddr { INPUT = 0, OUTPUT = 1 };
 
 template<port _port, uint8_t bit> class pin_t
 {
@@ -28,7 +28,7 @@ template<port _port, uint8_t bit> class pin_t
         }
         constexpr bool operator!() {
             // Logical negation operator (read bit).
-            return ~this->read();
+            return ~(this->read());
         }
         constexpr bool operator!=(bool n) {
             // Not equal to operator (read bit).
@@ -46,6 +46,7 @@ template<port _port, uint8_t bit> class pin_t
             return this->read();
         }
 
+    private:
         static constexpr bool read() { return *(volatile uint8_t*)_pin & mask; }
 };
 

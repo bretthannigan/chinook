@@ -3,7 +3,12 @@
 extern "C++"{
   #include "statemachine.h"
 }
+
+#if false
 #include <Arduino.h>
+#endif
+
+//#include <Arduino.h>
 #include <avr/interrupt.h>
 
 state_t CurrentState;
@@ -16,7 +21,7 @@ int main(void) {
   bool isStateReady;
 
   // Configure pin modes.
-  Serial.begin(115200);
+  //Serial.begin(115200);
 
   cli();
   // Set timer interrupt for sampling rate.

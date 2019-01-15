@@ -3,7 +3,12 @@
 extern "C++"{
   #include "statemachine.h"
 }
+
+#if false
 #include <Arduino.h>
+#endif
+
+//#include <Arduino.h>
 #include <avr/interrupt.h>
 
 state_t CurrentState;
@@ -11,15 +16,15 @@ instance_data_t CurrentData;
 volatile uint8_t TimerTicks = 0;
 volatile bool IsStateReady = 1;
 
-#line 12 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino"
+#line 17 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino"
 int main(void);
-#line 12 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino"
+#line 17 "/Users/brett/Documents/Projects/chinook/StateMachineWorkingCpp.ino"
 int main(void) {
   uint8_t timerTicks;
   bool isStateReady;
 
   // Configure pin modes.
-  Serial.begin(115200);
+  //Serial.begin(115200);
 
   cli();
   // Set timer interrupt for sampling rate.
