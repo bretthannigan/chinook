@@ -1,5 +1,10 @@
 #include "statemachine.h"
-//#include <Arduino.h>
+
+/* I/O Pins */
+
+pin_t<C, 3> pin_oFanLED = pin_t<C, 3>(OUTPUT);
+pin_t<C, 2> pin_oGlowLED = pin_t<C, 2>(OUTPUT);
+pin_t<C, 1> pin_oErrorLED = pin_t<C, 1>(OUTPUT);
 
 /* State Functions */
 
@@ -11,7 +16,7 @@ void onAllStates(instance_data_t *data) {
 state_t onStateInitial(instance_data_t *data) {
   //Serial.println("Initial state");
   data->iState = 0;
-  data->heater = new eberbn2(3, 4, 5, 6, 7);
+  data->heater = new eberbn2();
   // Initialize pins. Heater interface pins are taken care of by eberbn2 class.
   data->errorCode = ERROR_NONE;
   return STATE_STANDBY;
@@ -71,7 +76,6 @@ state_t onStateRun(instance_data_t *data) {
 }
 
 state_t onStateCooldown(instance_data_t *data) {
-  //Serial.println("Cooldown state");
   if (data->heater->get_flameSwitch()) {
     data->errorCode = ERROR_NOFLAME;
     return STATE_ERROR_COOLDOWN;
@@ -88,7 +92,6 @@ state_t onStateCooldown(instance_data_t *data) {
 }
 
 state_t onStateErrorCooldown(instance_data_t *data) {
-  //Serial.println("Error cooldown state");
   flashErrorCode(data->errorCode);
   if (data->iState*SAMPLE_TIME_MS > TIMEOUT_STATE_COOLDOWN_MS) {
     return STATE_ERROR_COOLDOWN;
@@ -98,7 +101,6 @@ state_t onStateErrorCooldown(instance_data_t *data) {
 }
 
 state_t onStateError(instance_data_t *data) {
-  //Serial.println("Error state");
   flashErrorCode(data->errorCode);
   return STATE_ERROR;
 }
@@ -106,26 +108,22 @@ state_t onStateError(instance_data_t *data) {
 /* State Transition Functions */
 
 void onAllTransitions(instance_data_t *data) {
-  //Serial.println("On all transitions");
   data->iState = 0;
 }
 
 void onTransitionStandby(instance_data_t *data) {
-  //Serial.println("Standby transition");
   data->heater->set_fuelRelay(0);
   data->heater->set_fanRelay(0);
   data->heater->set_glowRelay(0);
 }
 
 void onTransitionWarmup(instance_data_t *data) {
-  //Serial.println("Warmup transition");
   data->heater->set_fuelRelay(0);
   data->heater->set_fanRelay(0);
   data->heater->set_glowRelay(1);
 }
 
 void onTransitionStart(instance_data_t *data) {
-  //Serial.println("Start transition");
   data->heater->set_fuelRelay(1);
   data->heater->set_fanRelay(1);
   data->heater->set_glowRelay(1);
@@ -158,7 +156,6 @@ void onTransitionError(instance_data_t *data) {
 /* State Transition Mechanism */
 
 state_t run_state(state_t current_state, instance_data_t *data) {
-  //Serial.println("    Run state");
   onAllStates(data);
   state_t new_state = state_table[current_state][new_state](data);
   transition_func_t* transition = transition_table[current_state][new_state];
@@ -174,9 +171,10 @@ state_t run_state(state_t current_state, instance_data_t *data) {
 void flashErrorCode(error_t err) {
   static uint16_t iFlash = 0;
   if (iFlash%(NUM_ERRORS << 1)<(err << 1)) {
-    gpio_wr(PIN, _PIN_O_LED_ERROR_, iFlash%2);
+    pin_oErrorLED = iFlash%2;
+    //gpio_wr(PIN, _PIN_O_LED_ERROR_, iFlash%2);
   } else {
-    gpio_clr(_PIN_O_LED_ERROR_);
+    pin_oErrorLED = false;
   }
   iFlash++;
 }

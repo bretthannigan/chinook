@@ -24,7 +24,7 @@ template<port _port, uint8_t bit> class pin_t
         }
         constexpr bool operator==(bool n) {
             // Equal to operator (read bit).
-            return this->read();
+            return this->read() == n;
         }
         constexpr bool operator!() {
             // Logical negation operator (read bit).

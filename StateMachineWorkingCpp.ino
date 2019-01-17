@@ -6,7 +6,6 @@ extern "C++"{
 #include <Arduino.h>
 #endif
 
-//#include <Arduino.h>
 #include <avr/interrupt.h>
 
 state_t CurrentState;

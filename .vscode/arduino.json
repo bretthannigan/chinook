@@ -2,5 +2,5 @@
     "board": "arduino:avr:uno",
     "port": "/dev/cu.usbmodem3D21",
     "sketch": "StateMachineWorkingCpp.ino",
-    "output": "./build"
+    "output": "../build"
 }

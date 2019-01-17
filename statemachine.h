@@ -7,10 +7,8 @@
 
 #define _MOVING_AVERAGE_SIZE_ 5
 
-//#include <Arduino.h>
 #include "eberbn2.h"
 #include "timeoutconstants.h"
-#include "pins.h"
 
 typedef enum { STATE_INITIAL, STATE_STANDBY, STATE_WARMUP, STATE_START, STATE_RUN, STATE_COOLDOWN, STATE_ERROR_COOLDOWN, STATE_ERROR, NUM_STATES } state_t;
 typedef enum { ERROR_NONE, ERROR_NOFLAME, ERROR_FLAME, ERROR_OVERHEAT, ERROR_VOLTAGE, NUM_ERRORS } error_t;
@@ -47,6 +45,8 @@ void flashErrorCode(error_t err);
 state_func_t* const state_table[NUM_STATES] = {
   onStateInitial, onStateStandby, onStateWarmup, onStateStart, onStateRun, onStateCooldown, onStateErrorCooldown, onStateError
 };
+
+/* State Transition Table */
 
 transition_func_t* const transition_table[NUM_STATES][NUM_STATES] = {
   // TO:

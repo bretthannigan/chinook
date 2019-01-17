@@ -1,8 +1,6 @@
 #ifndef pins_h
 #define pins_h
 
-#include "gpio.h"
-
 // Relay outputs.
 #define _PIN_O_FAN_RELAY_ D, 5, 5 // PWM
 #define _PIN_O_GLOW_RELAY_ B, 0, 0
